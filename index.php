@@ -47,7 +47,7 @@ $adverts = [
 
 function formatPrice ($dig) {
     if (ceil($dig) > 1000) {
-        $dig = substr("$dig", 0, strlen("$dig") - 3) . " " . substr("$dig", -3) . " " . "\u{20BD}"; 
+        $dig = number_format($dig, 0, "", " ") . " " . "\u{20BD}";
     }
     return $dig;
 }
