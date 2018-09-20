@@ -2,6 +2,8 @@
 
 require('functions.php');
 
+$is_auth = rand(0, 1);
+
 $user_name = 'Alexander';
 $user_avatar = 'img/user.jpg';
 
@@ -48,7 +50,7 @@ $adverts = [
 
 $page_content = include_template('index.php', ['categories' => $categories, 'adverts' => $adverts]);
 
-$layout_content = include_template('layout.php', ['content' => $page_content, 'title' => 'Yeticave главная', 'user_name' => $user_name, 'user_avatar' => $user_avatar, 'categories' => $categories]);
+$layout_content = include_template('layout.php', ['content' => $page_content, 'title' => 'Yeticave главная', 'user_name' => $user_name, 'user_avatar' => $user_avatar, 'categories' => $categories, 'is_auth' => $is_auth]);
 
 print($layout_content);
 
