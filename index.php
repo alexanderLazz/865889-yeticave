@@ -7,6 +7,9 @@ $is_auth = rand(0, 1);
 $user_name = 'Alexander';
 $user_avatar = 'img/user.jpg';
 
+/* время жизни лота - кол-во часов и минут, оставшихся до полуночи */
+$lifetime_lot = gmdate('H:i', strtotime("tomorrow") - time());
+
 $categories = ["Доски и лыжи", "Крепления", "Ботинки", "Одежда", "Инструменты", "Разное"];
 
 $adverts = [
@@ -48,7 +51,7 @@ $adverts = [
     ]
 ];
 
-$page_content = include_template('index.php', ['categories' => $categories, 'adverts' => $adverts]);
+$page_content = include_template('index.php', ['categories' => $categories, 'adverts' => $adverts, 'lifetime_lot' => $lifetime_lot]);
 
 $layout_content = include_template('layout.php', ['content' => $page_content, 'title' => 'Yeticave главная', 'user_name' => $user_name, 'user_avatar' => $user_avatar, 'categories' => $categories, 'is_auth' => $is_auth]);
 

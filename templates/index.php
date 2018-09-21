@@ -29,7 +29,7 @@
                         <span class="lot__cost"><?=formatPrice(htmlspecialchars($value['price'])) ?></span>
                     </div>
                     <div class="lot__timer timer">
-
+                        <?=$lifetime_lot ?>
                     </div>
                 </div>
             </div>
