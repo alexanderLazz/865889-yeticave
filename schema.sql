@@ -26,16 +26,16 @@ CREATE TABLE `lot` (
 	`starting_price`	FLOAT NOT NULL,
 	`closing_date`		DATE NOT NULL,
 	`bid_step`			FLOAT NOT NULL,
-	`rid_author`		INT NOT NULL,
-	`rid_winner`		INT NOT NULL,
-	`rid_category`		INT NOT NULL
+	`author_id`			INT NOT NULL,
+	`winner_id`			INT NOT NULL,
+	`category_id`		INT NOT NULL
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 CREATE TABLE `bid` (
 	`id`			INT AUTO_INCREMENT PRIMARY KEY,
 	`date_of`		DATE NOT NULL,
-	`rid_user`		INT NOT NULL,
-	`rid_lot`		INT NOT NULL
+	`user_id`		INT NOT NULL,
+	`lot_id`		INT NOT NULL
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 CREATE TABLE `user` (
@@ -45,9 +45,7 @@ CREATE TABLE `user` (
 	`name`				CHAR(130) NOT NULL,
 	`password`			CHAR(70) NOT NULL,
 	`avatar`			CHAR(120),
-	`contacts`			VARCHAR(150) NOT NULL,
-	`rid_created_lots`	INT NOT NULL,
-	`rid_bids`			INT NOT NULL
+	`contacts`			VARCHAR(150) NOT NULL
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 
@@ -61,21 +59,15 @@ CREATE INDEX name_lot ON lot(name);
 
 
 ALTER TABLE `lot`
-	ADD CONSTRAINT `fk_rid_author` FOREIGN KEY (`rid_author`) REFERENCES `user` (`id`)
+	ADD CONSTRAINT `fk_author_id` FOREIGN KEY (`author_id`) REFERENCES `user` (`id`)
 		ON UPDATE CASCADE ON DELETE RESTRICT,
-	ADD CONSTRAINT `fk_rid_winner` FOREIGN KEY (`rid_winner`) REFERENCES `user` (`id`)
+	ADD CONSTRAINT `fk_winner_id` FOREIGN KEY (`winner_id`) REFERENCES `user` (`id`)
 		ON UPDATE CASCADE ON DELETE RESTRICT,
-	ADD CONSTRAINT `fk_rid_category` FOREIGN KEY (`rid_category`) REFERENCES `category` (`id`)
+	ADD CONSTRAINT `fk_category_id` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`)
 		ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE `bid`
-	ADD CONSTRAINT `fk_rid_user` FOREIGN KEY (`rid_user`) REFERENCES `user` (`id`)
+	ADD CONSTRAINT `fk_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
 		ON UPDATE CASCADE ON DELETE RESTRICT,
-	ADD CONSTRAINT `fk_rid_lot` FOREIGN KEY (`rid_lot`) REFERENCES `lot` (`id`)
-		ON UPDATE CASCADE ON DELETE RESTRICT;
-
-ALTER TABLE `user`
-	ADD CONSTRAINT `fk_rid_created_lots` FOREIGN KEY (`rid_created_lots`) REFERENCES `lot` (`id`)
-		ON UPDATE CASCADE ON DELETE RESTRICT,
-	ADD CONSTRAINT `fk_rid_bids` FOREIGN KEY (`rid_bids`) REFERENCES `bid` (`id`)
+	ADD CONSTRAINT `fk_lot_id` FOREIGN KEY (`lot_id`) REFERENCES `lot` (`id`)
 		ON UPDATE CASCADE ON DELETE RESTRICT;
