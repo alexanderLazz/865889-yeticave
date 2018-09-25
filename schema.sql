@@ -27,13 +27,14 @@ CREATE TABLE `lot` (
 	`closing_date`		DATE NOT NULL,
 	`bid_step`			FLOAT NOT NULL,
 	`author_id`			INT NOT NULL,
-	`winner_id`			INT NOT NULL,
+	`winner_id`			INT,
 	`category_id`		INT NOT NULL
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 CREATE TABLE `bid` (
 	`id`			INT AUTO_INCREMENT PRIMARY KEY,
 	`date_of`		DATE NOT NULL,
+	`sum`			FLOAT NOT NULL,
 	`user_id`		INT NOT NULL,
 	`lot_id`		INT NOT NULL
 ) ENGINE=InnoDB CHARACTER SET=utf8;
