@@ -32,17 +32,18 @@ INSERT INTO `bid` (`date_of`, `sum`, `user_id`, `lot_id`)
 
 
 
+
 /* запрос на получение всех категорий */
 SELECT `name` FROM `category`;
 
 /* запрос на получение самых новых, открытых лотов */
-SELECT `lot`.`name`, `starting_price`, `image_url`, COUNT(`bid`.`id`) as 'count_bids', MAX(`bid`.`sum`) as 'price', `category`.`name` as 'category'
+SELECT `lot`.`name`, `starting_price`, `image_url`, COUNT(`bid`.`id`) as 'count_bids', MAX(`bid`.`sum`) as 'max_bid', `category`.`name` as 'category'
 FROM `lot`
 JOIN `category` ON `category`.`id` = `lot`.`category_id`
 LEFT JOIN `bid` ON `lot`.`id` = `bid`.`lot_id`
 WHERE `lot`.`closing_date` >= CURDATE() 
 AND `lot`.`winner_id` is NULL
-GROUP BY `lot`.`name`, `lot`.`id`, `lot`.`starting_price`, `lot`.`image_url`, `lot`.`category_id`, `lot`.`creation_date`
+GROUP BY `lot`.`id`
 ORDER BY `lot`.`creation_date` DESC LIMIT 3; 
 
 /* запрос на получение лотов и категорий по id */
@@ -59,7 +60,7 @@ WHERE `lot`.`id` = 3;
 SELECT MAX(`date_of`) as 'date', MAX(`sum`) as 'last_bid', `lot`.`name` as 'lot'
 FROM `bid`
 JOIN `lot` ON `lot`.`id` = `bid`.`lot_id`
-GROUP BY `lot`.`name`;
+GROUP BY `lot`.`id`;
 
 
 
