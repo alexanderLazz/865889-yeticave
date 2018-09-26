@@ -2,40 +2,43 @@
 
 require_once('functions.php');
 
+/* количество лотов на главной странице */
+$limit_show_lots = 6;
+
 $link = mysqli_connect("localhost", "user", "", "yeticave");
 mysqli_set_charset($link, "utf8");
 
 if (!$link) {
     printf("Не удалось подключиться: %s\n", mysqli_connect_error());
+    die();
 }
-else {
-    /* получаем список категорий из БД */
-    $query_get_categories = "SELECT `id`, `name` FROM `category`";
-    
-    $result_get_categories = mysqli_query($link, $query_get_categories);
 
-    if ($result_get_categories) {
-        $categories = mysqli_fetch_all($result_get_categories, MYSQLI_ASSOC);
-    }
-    else {
-        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
-    }
+/* получаем список категорий из БД */
+$query_get_categories = "SELECT `id`, `name` FROM `category`";
 
-    /* получаем список лотов из БД */
-    $query_get_lots = "SELECT `lot`.`name` as 'item', `category`.`name` as 'category', `starting_price`, `image_url` FROM `lot` 
-                        JOIN `category` ON `category`.`id` = `lot`.`category_id`
-                        WHERE `lot`.`closing_date` >= CURDATE()
-                        ORDER BY `lot`.`creation_date` DESC";
+$result_get_categories = mysqli_query($link, $query_get_categories);
 
-    $result_get_lots = mysqli_query($link, $query_get_lots);
-
-    if ($result_get_lots) {
-        $adverts = mysqli_fetch_all($result_get_lots, MYSQLI_ASSOC);
-    }
-    else {
-        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
-    }
+if (!$result_get_categories) {
+    printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+    die();
 }
+
+$categories = mysqli_fetch_all($result_get_categories, MYSQLI_ASSOC);
+
+/* получаем список лотов из БД */
+$query_get_lots = "SELECT `lot`.`name` as 'item', `category`.`name` as 'category', `starting_price`, `image_url` FROM `lot` 
+                    JOIN `category` ON `category`.`id` = `lot`.`category_id`
+                    WHERE `lot`.`closing_date` >= CURDATE()
+                    ORDER BY `lot`.`creation_date` DESC LIMIT $limit_show_lots";
+
+$result_get_lots = mysqli_query($link, $query_get_lots);
+
+if (!$result_get_lots) {
+    printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+    die();
+}
+
+$adverts = mysqli_fetch_all($result_get_lots, MYSQLI_ASSOC);
 
 $is_auth = rand(0, 1);
 
