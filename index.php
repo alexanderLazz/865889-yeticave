@@ -1,6 +1,41 @@
 <?php
 
-require('functions.php');
+require_once('functions.php');
+
+$link = mysqli_connect("localhost", "user", "", "yeticave");
+mysqli_set_charset($link, "utf8");
+
+if (!$link) {
+    printf("Не удалось подключиться: %s\n", mysqli_connect_error());
+}
+else {
+    /* получаем список категорий из БД */
+    $query_get_categories = "SELECT `id`, `name` FROM `category`";
+    
+    $result_get_categories = mysqli_query($link, $query_get_categories);
+
+    if ($result_get_categories) {
+        $categories = mysqli_fetch_all($result_get_categories, MYSQLI_ASSOC);
+    }
+    else {
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+    }
+
+    /* получаем список лотов из БД */
+    $query_get_lots = "SELECT `lot`.`name` as 'item', `category`.`name` as 'category', `starting_price`, `image_url` FROM `lot` 
+                        JOIN `category` ON `category`.`id` = `lot`.`category_id`
+                        WHERE `lot`.`closing_date` >= CURDATE()
+                        ORDER BY `lot`.`creation_date` DESC";
+
+    $result_get_lots = mysqli_query($link, $query_get_lots);
+
+    if ($result_get_lots) {
+        $adverts = mysqli_fetch_all($result_get_lots, MYSQLI_ASSOC);
+    }
+    else {
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+    }
+}
 
 $is_auth = rand(0, 1);
 
@@ -9,47 +44,6 @@ $user_avatar = 'img/user.jpg';
 
 /* время жизни лота - кол-во часов и минут, оставшихся до полуночи */
 $lifetime_lot = gmdate('H:i', strtotime("tomorrow") - time());
-
-$categories = ["Доски и лыжи", "Крепления", "Ботинки", "Одежда", "Инструменты", "Разное"];
-
-$adverts = [
-    [
-        'item' => '2014 Rossignol District Snowboard',
-        'category' => $categories[0],
-        'price' => 10999,
-        'url' => 'img/lot-1.jpg'
-    ],
-    [
-        'item' => 'DC Ply Mens 2016/2017 Snowboard',
-        'category' => $categories[0],
-        'price' => 159999,
-        'url' => 'img/lot-2.jpg'
-    ],
-    [
-        'item' => 'Крепления Union Contact Pro 2015 года размер L/XL',
-        'category' => $categories[1],
-        'price' => 8000,
-        'url' => 'img/lot-3.jpg'
-    ],
-    [
-        'item' => 'Ботинки для сноуборда DC Mutiny Charocal',
-        'category' => $categories[2],
-        'price' => 10999,
-        'url' => 'img/lot-4.jpg'
-    ],
-    [
-        'item' => 'Куртка для сноуборда DC Mutiny Charocal',
-        'category' => $categories[3],
-        'price' => 7500,
-        'url' => 'img/lot-5.jpg'
-    ],
-    [
-        'item' => 'Маска Oakley Canopy',
-        'category' => $categories[5],
-        'price' => 5400,
-        'url' => 'img/lot-6.jpg'
-    ]
-];
 
 $page_content = include_template('index.php', ['categories' => $categories, 'adverts' => $adverts, 'lifetime_lot' => $lifetime_lot]);
 

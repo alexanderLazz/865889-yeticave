@@ -4,7 +4,7 @@
     <ul class="promo__list">
         <?php foreach ($categories as $key => $value) { ?>
         <li class="promo__item promo__item--boards">
-            <a class="promo__link" href="pages/all-lots.html"><?=$value ?></a>
+            <a class="promo__link" href="pages/all-lots.html"><?=$value['name'] ?></a>
         </li>
         <?php 
         } ?>
@@ -18,7 +18,7 @@
         <?php foreach ($adverts as $key => $value) { ?>
         <li class="lots__item lot">
             <div class="lot__image">
-                <img src="<?=htmlspecialchars($value['url']) ?>" width="350" height="260" alt="<?=htmlspecialchars($value['item']) ?>">
+                <img src="<?=htmlspecialchars($value['image_url']) ?>" width="350" height="260" alt="<?=htmlspecialchars($value['item']) ?>">
             </div>
             <div class="lot__info">
                 <span class="lot__category"><?=htmlspecialchars($value['category']) ?></span>
@@ -26,7 +26,7 @@
                 <div class="lot__state">
                     <div class="lot__rate">
                         <span class="lot__amount">Стартовая цена</span>
-                        <span class="lot__cost"><?=formatPrice(htmlspecialchars($value['price'])) ?></span>
+                        <span class="lot__cost"><?=formatPrice(htmlspecialchars($value['starting_price'])) ?></span>
                     </div>
                     <div class="lot__timer timer">
                         <?=$lifetime_lot ?>
