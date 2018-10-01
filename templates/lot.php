@@ -20,7 +20,7 @@
     <div class="lot-item__right">
       <div class="lot-item__state">
         <div class="lot-item__timer timer">
-          <?=$lifetime_lot ?>
+          <?=lifetimeLot($advert['closing_date']) ?>
         </div>
         <div class="lot-item__cost-state">
           <div class="lot-item__rate">

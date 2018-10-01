@@ -21,8 +21,18 @@ function formatPrice($dig) {
     return (number_format(ceil($dig), 0, "", " ") . " " . "\u{20BD}");
 }
 
-function timeToMidnight() {
-    return gmdate('H:i', strtotime("tomorrow") - time());
+function lifetimeLot($end_date) {
+    $diff_sec = strtotime($end_date) - time();
+    $days = floor($diff_sec / 86400);
+    $hours = floor(($diff_sec % 86400) / 3600);
+    $minutes = floor(($diff_sec % 3600) / 60);
+
+    if ($days > 0) {
+        return $days . 'д ' . $hours . 'ч ' . $minutes . 'м';
+    }
+    else {
+        return $hours . 'ч ' . $minutes . 'м';   
+    }
 }
 
 function dbConnect() {
@@ -64,7 +74,7 @@ function dbGetCategories() {
 function dbGetAdverts($limit) {
     $link = dbConnect();
 
-    $query_get_lots = "SELECT `lot`.`id`, `lot`.`name` as 'item', `category`.`name` as 'category', `starting_price`, `image_url` 
+    $query_get_lots = "SELECT `lot`.`id`, `lot`.`name` as 'item', `category`.`name` as 'category', `starting_price`, `image_url`, `closing_date` 
                         FROM `lot` 
                         JOIN `category` ON `category`.`id` = `lot`.`category_id`
                         WHERE `lot`.`closing_date` >= CURDATE()
@@ -83,9 +93,9 @@ function dbGetAdverts($limit) {
 /* получение лота по id */
 function dbGetLot($lotId) {
     $link = dbConnect();
-    
+
     $query_get_lot = "SELECT `lot`.`id`, `lot`.`name` as 'item', `category`.`name` as 'category', `starting_price`, `image_url`, `description`, 
-                                MAX(`bid`.`sum`) as 'max_bid', `bid_step`
+                                MAX(`bid`.`sum`) as 'max_bid', `bid_step`, `closing_date`
                         FROM `lot` 
                         LEFT JOIN `bid` ON `lot`.`id` = `bid`.`lot_id`
                         JOIN `category` ON `category`.`id` = `lot`.`category_id`
@@ -99,7 +109,7 @@ function dbGetLot($lotId) {
         die();
     }
 
-    if ($result_get_lot->num_rows < 1) {
+    if (mysqli_num_rows($result_get_lot) < 1) {
         http_response_code(404);
         die();
     }
