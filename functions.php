@@ -54,6 +54,41 @@ function dbConnect() {
     return $link;
 }
 
+function db_get_prepare_stmt($link, $sql, $data = []) {
+    $stmt = mysqli_prepare($link, $sql);
+
+    if ($data) {
+        $types = '';
+        $stmt_data = [];
+
+        foreach ($data as $value) {
+            $type = null;
+
+            if (is_int($value)) {
+                $type = 'i';
+            }
+            else if (is_string($value)) {
+                $type = 's';
+            }
+            else if (is_double($value)) {
+                $type = 'd';
+            }
+
+            if ($type) {
+                $types .= $type;
+                $stmt_data[] = $value;
+            }
+        }
+
+        $values = array_merge([$stmt, $types], $stmt_data);
+
+        $func = 'mysqli_stmt_bind_param';
+        $func(...$values);
+    }
+
+    return $stmt;
+}
+
 /* получение категорий */
 function dbGetCategories() {
     $link = dbConnect();
@@ -115,6 +150,27 @@ function dbGetLot($lotId) {
     }
 
     return mysqli_fetch_assoc($result_get_lot);
+}
+
+/* добавление нового лота, возвращает id добавленного лота */
+function dbAddLot($adv) {
+    $link = dbConnect();
+
+    $sql = 'INSERT INTO `lot` (`creation_date`, `name`, `description`, `image_url`, `starting_price`, `closing_date`, `bid_step`, 
+                `author_id`, `winner_id`, `category_id`) VALUES (NOW(), ?, ?, ?, ?, ?, ?, 1, NULL, ?)';
+
+    $stmt = db_get_prepare_stmt($link, $sql, [$adv['lot-name'], $adv['message'], $adv['path'], $adv['lot-rate'], $adv['lot-date'], 
+                    $adv['lot-step'], $adv['category']]);
+
+    $res = mysqli_stmt_execute($stmt);
+
+    if (!$res) {
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        http_response_code(404);
+        die();
+    }
+
+    return mysqli_insert_id($link);
 }
 
 ?>
