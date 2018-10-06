@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$required = ['lot-name', 'message', 'lot-rate', 'lot-step'];
 	$required_num = ['lot-rate', 'lot-step'];
 	$errors = [];
+	$allowed_types = ['image/jpeg', 'image/png'];
 
 	/* проверка на заполненность текстовых полей */
 	foreach ($required as $key) {
@@ -27,28 +28,41 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		}
 	}
 
-	/* проверка даты на валидность */
-	if (strtotime($adv['lot-date']) < strtotime('tomorrow')) {
+	/* проверка даты на валидность: 
+	что указанная дата больше текущей даты хотя бы на один день */
+	if (strtotime($adv['lot-date']) - time() < 86400) {
 		$errors['lot-date'] = 'Некорректная дата';
 	}
 
 	/* проверка - была ли выбрана категория */
-	if (!array_key_exists($adv['category'], $categories)) {
+	$flag_ch_category = 0;
+	foreach ($categories as $key => $value) {
+		if ($value['id'] == $adv['category']) {
+			$flag_ch_category = 1;
+		}
+	}
+	if (!$flag_ch_category) {
 		$errors['category'] = 'Выберите категорию';
 	}
 
 	/* если был получен файл */
-	if (isset($_FILES['lot-img']['name'])) {
+	if (!empty($_FILES['lot-img']['name'])) {
 		$tmp_name = $_FILES['lot-img']['tmp_name'];
-		$path = basename($_FILES['lot-img']['name']);
+		$gen_filename = 'image_'.uniqid();
+		$split_name = explode('.', $_FILES['lot-img']['name']);
+		$file_extension = end($split_name);
+		$filename = $gen_filename . '.' . $file_extension;
 
-		/* проверка - является ли файл картинкой */
-		if (!@getimagesize($tmp_name)) {
-			$errors['file'] = 'Файл не похож на изображение';
+		$finfo = finfo_open(FILEINFO_MIME_TYPE);
+		$file_type = finfo_file($finfo, $tmp_name);
+
+		/* проверка - является ли файл формата jpeg или png */
+		if (!in_array($file_type, $allowed_types)) {
+			$errors['file'] = 'Необходимо загрузить файл в формате .jpg или .png';
 		}
 		else {
-			move_uploaded_file($tmp_name, 'img/' . $path);
-			$adv['path'] = 'img/' . $path;
+			move_uploaded_file($tmp_name, 'img/' . $filename);
+			$adv['path'] = 'img/' . $filename;
 		}
 	}
 	else {
@@ -64,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$res_lot_id = dbAddLot($adv);
 
 		header("Location: lot.php?id=" . $res_lot_id);
+		die();
 		}
 }
 else {
