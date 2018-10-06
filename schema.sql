@@ -19,12 +19,12 @@ CREATE TABLE `category` (
  
 CREATE TABLE `lot` (
 	`id`				INT AUTO_INCREMENT PRIMARY KEY,
-	`creation_date`		DATE NOT NULL,
+	`creation_date`		DATETIME NOT NULL,
 	`name`				CHAR(130) NOT NULL,
 	`description`		VARCHAR(170) NOT NULL,
 	`image_url`			VARCHAR(120) NOT NULL,
 	`starting_price`	FLOAT NOT NULL,
-	`closing_date`		DATE NOT NULL,
+	`closing_date`		DATETIME NOT NULL,
 	`bid_step`			FLOAT NOT NULL,
 	`author_id`			INT NOT NULL,
 	`winner_id`			INT,
@@ -33,7 +33,7 @@ CREATE TABLE `lot` (
 
 CREATE TABLE `bid` (
 	`id`			INT AUTO_INCREMENT PRIMARY KEY,
-	`date_of`		DATE NOT NULL,
+	`date_of`		DATETIME NOT NULL,
 	`sum`			FLOAT NOT NULL,
 	`user_id`		INT NOT NULL,
 	`lot_id`		INT NOT NULL
@@ -41,7 +41,7 @@ CREATE TABLE `bid` (
 
 CREATE TABLE `user` (
 	`id`				INT AUTO_INCREMENT PRIMARY KEY,
-	`reg_date`			DATE NOT NULL,
+	`reg_date`			DATETIME NOT NULL,
 	`email`				CHAR(120) NOT NULL,
 	`name`				CHAR(130) NOT NULL,
 	`password`			CHAR(70) NOT NULL,
