@@ -173,4 +173,56 @@ function dbAddLot($adv) {
     return mysqli_insert_id($link);
 }
 
+function dbCheckEmail($email) {
+    $link = dbConnect();
+
+    $emailClear = mysqli_real_escape_string($link, $email);
+
+    $query_check_email = "SELECT `id` FROM `user` WHERE `email` = '$emailClear'";
+
+    $result_check_email = mysqli_query($link, $query_check_email);
+
+    return mysqli_num_rows($result_check_email);
+}
+
+function loadImg($tmp_name, $u_name) {
+    $allowed_types = ['image/jpeg', 'image/png'];
+
+    $gen_filename = 'image_'.uniqid();
+    $split_name = explode('.', $u_name);
+    $file_extension = end($split_name);
+    $filename = $gen_filename . '.' . $file_extension;
+
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $file_type = finfo_file($finfo, $tmp_name);
+
+    /* проверка - является ли файл формата jpeg или png */
+    if (!in_array($file_type, $allowed_types)) {
+        return -1;
+    }
+    else {
+        move_uploaded_file($tmp_name, 'user_upload/' . $filename);
+        return 'user_upload/' . $filename;
+    }
+}
+
+function dbAddUser($data) {
+    $link = dbConnect();
+
+    $sql = 'INSERT INTO `user` (`reg_date`, `email`, `name`, `password`, `avatar`, `contacts`) 
+                VALUES  (NOW(), ?, ?, ?, ?, ?)';
+
+    $stmt = db_get_prepare_stmt($link, $sql, [$data['email'], $data['name'], $data['password'], $data['path'], $data['message']]);
+
+    $res = mysqli_stmt_execute($stmt);
+
+    if (!$res) {
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        http_response_code(404);
+        die();
+    }
+
+    return 1;
+}
+
 ?>
