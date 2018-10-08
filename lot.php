@@ -1,8 +1,8 @@
 <?php 
 
 require_once('functions.php');
-require_once('settings.php');
 
+$userSes = startSession();
 
 $categories = dbGetCategories();
 
@@ -21,7 +21,8 @@ $next_avail_bid = $cur_price + $advert['bid_step'];
 $page_content = include_template('lot.php', ['advert' => $advert, 'categories' => $categories, 'cur_price' => $cur_price, 
 	'next_avail_bid' => $next_avail_bid]);
 
-$layout_content = include_template('layout.php', ['content' => $page_content, 'title' => $advert['item'], 'user_name' => $user_name, 'user_avatar' => $user_avatar, 'categories' => $categories, 'is_auth' => $is_auth]);
+$layout_content = include_template('layout.php', ['content' => $page_content, 'title' => $advert['item'], 
+		'user_name' => $userSes['user_name'], 'user_avatar' => $userSes['user_avatar'], 'categories' => $categories]);
 
 print($layout_content);
 

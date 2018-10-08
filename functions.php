@@ -182,7 +182,31 @@ function dbCheckEmail($email) {
 
     $result_check_email = mysqli_query($link, $query_check_email);
 
+    if (!$result_check_email) {
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        http_response_code(404);
+        die();
+}
+
     return mysqli_num_rows($result_check_email);
+}
+
+function dbGetUserData($email) {
+    $link = dbConnect();
+
+    $emailClear = mysqli_real_escape_string($link, $email);
+
+    $query_check_email = "SELECT * FROM `user` WHERE `email` = '$emailClear'";
+
+    $result_check_email = mysqli_query($link, $query_check_email);
+
+    if (!$result_check_email) {
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        http_response_code(404);
+        die();
+}
+
+    return mysqli_fetch_assoc($result_check_email);
 }
 
 function loadImg($tmp_name, $u_name) {
@@ -209,10 +233,16 @@ function loadImg($tmp_name, $u_name) {
 function dbAddUser($data) {
     $link = dbConnect();
 
-    $sql = 'INSERT INTO `user` (`reg_date`, `email`, `name`, `password`, `avatar`, `contacts`) 
-                VALUES  (NOW(), ?, ?, ?, ?, ?)';
-
-    $stmt = db_get_prepare_stmt($link, $sql, [$data['email'], $data['name'], $data['password'], $data['path'], $data['message']]);
+    if (isset($data['path'])) {
+        $sql = 'INSERT INTO `user` (`reg_date`, `email`, `name`, `password`, `avatar`, `contacts`) 
+                    VALUES  (NOW(), ?, ?, ?, ?, ?)';
+        $stmt = db_get_prepare_stmt($link, $sql, [$data['email'], $data['name'], $data['password'], $data['path'], $data['message']]);
+    } 
+    else {
+        $sql = 'INSERT INTO `user` (`reg_date`, `email`, `name`, `password`, `avatar`, `contacts`) 
+                    VALUES  (NOW(), ?, ?, ?, NULL, ?)';
+        $stmt = db_get_prepare_stmt($link, $sql, [$data['email'], $data['name'], $data['password'], $data['message']]);  
+    }
 
     $res = mysqli_stmt_execute($stmt);
 
@@ -223,6 +253,22 @@ function dbAddUser($data) {
     }
 
     return 1;
+}
+
+function startSession() {
+    session_start();
+    $userSes = [];
+
+    if (!empty($_SESSION['user'])) {
+        $userSes['user_name'] = $_SESSION['user']['name'];
+        $userSes['user_avatar'] = $_SESSION['user']['avatar'];
+    }
+    else {
+        $userSes['user_name'] = $userSes['user_avatar'] = NULL;
+    }
+
+    return $userSes;
+
 }
 
 ?>

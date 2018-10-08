@@ -1,7 +1,8 @@
 <?php 
 
 require_once('functions.php');
-require_once('settings.php');
+
+$userSes = startSession();
 
 $categories = dbGetCategories();
 
@@ -78,7 +79,7 @@ else {
 
 
 $layout_content = include_template('layout.php', ['content' => $page_content, 'title' => "Yeticave - добавление лота", 
-		'user_name' => $user_name, 'user_avatar' => $user_avatar, 'categories' => $categories, 'is_auth' => $is_auth]);
+		'user_name' => $userSes['user_name'], 'user_avatar' => $userSes['user_avatar'], 'categories' => $categories]);
 
 print($layout_content);
 
