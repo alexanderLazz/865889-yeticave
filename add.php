@@ -1,7 +1,8 @@
 <?php 
 
 require_once('functions.php');
-require_once('settings.php');
+
+$userSes = startSession();
 
 $categories = dbGetCategories();
 
@@ -10,7 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	$required = ['lot-name', 'message', 'lot-rate', 'lot-step'];
 	$required_num = ['lot-rate', 'lot-step'];
 	$errors = [];
-	$allowed_types = ['image/jpeg', 'image/png'];
 
 	/* проверка на заполненность текстовых полей */
 	foreach ($required as $key) {
@@ -48,21 +48,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	/* если был получен файл */
 	if (!empty($_FILES['lot-img']['name'])) {
 		$tmp_name = $_FILES['lot-img']['tmp_name'];
-		$gen_filename = 'image_'.uniqid();
-		$split_name = explode('.', $_FILES['lot-img']['name']);
-		$file_extension = end($split_name);
-		$filename = $gen_filename . '.' . $file_extension;
-
-		$finfo = finfo_open(FILEINFO_MIME_TYPE);
-		$file_type = finfo_file($finfo, $tmp_name);
-
-		/* проверка - является ли файл формата jpeg или png */
-		if (!in_array($file_type, $allowed_types)) {
-			$errors['file'] = 'Необходимо загрузить файл в формате .jpg или .png';
+		$u_name_file = $_FILES['lot-img']['name'];
+		$resLoadImage = loadImg($tmp_name, $u_name_file);
+		if ($resLoadImage != -1) {
+			$adv['path'] = $resLoadImage;
 		}
 		else {
-			move_uploaded_file($tmp_name, 'img/' . $filename);
-			$adv['path'] = 'img/' . $filename;
+			$errors['file'] = 'Необходимо загрузить файл в формате .jpg или .png';
 		}
 	}
 	else {
@@ -86,7 +78,8 @@ else {
 }
 
 
-$layout_content = include_template('layout.php', ['content' => $page_content, 'title' => "Добавление лота", 'user_name' => $user_name, 'user_avatar' => $user_avatar, 'categories' => $categories, 'is_auth' => $is_auth]);
+$layout_content = include_template('layout.php', ['content' => $page_content, 'title' => "Yeticave - добавление лота", 
+		'user_name' => $userSes['user_name'], 'user_avatar' => $userSes['user_avatar'], 'categories' => $categories]);
 
 print($layout_content);
 
