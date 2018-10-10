@@ -18,6 +18,7 @@
       <p class="lot-item__description"><?=$advert['description'] ?></p>
     </div>
     <div class="lot-item__right">
+      <?php if (isset($_SESSION['user'])) { ?>
       <div class="lot-item__state">
         <div class="lot-item__timer timer">
           <?=lifetimeLot($advert['closing_date']) ?>
@@ -32,6 +33,8 @@
           </div>
         </div>
       </div>
+      <?php 
+      } ?>
     </div>
   </div>
 </section>

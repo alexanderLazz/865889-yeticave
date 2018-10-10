@@ -74,7 +74,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		}
 }
 else {
-	$page_content = include_template('add.php', ['categories' => $categories]);
+	if (isset($userSes['user_name'])) {
+		$page_content = include_template('add.php', ['categories' => $categories]);
+	}
+	else {
+		http_response_code(403);
+        die();
+	}
 }
 
 
