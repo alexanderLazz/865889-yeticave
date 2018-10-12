@@ -18,7 +18,6 @@
       <p class="lot-item__description"><?=$advert['description'] ?></p>
     </div>
     <div class="lot-item__right">
-      <?php if (isset($_SESSION['user'])) { ?>
       <div class="lot-item__state">
         <div class="lot-item__timer timer">
           <?=lifetimeLot($advert['closing_date']) ?>
@@ -33,8 +32,35 @@
           </div>
         </div>
       </div>
+      <?php if (isset($_SESSION['user']) and strtotime($advert['closing_date']) >= time() 
+                  and $advert['author_id'] != $_SESSION['user']['id'] and !$bidAlreadyDone) { 
+          $classname = isset($errorBid) ? "form--invalid" : ""; ?>
+      <form class="form container <?=$classname ?>" action="../lot.php?id=<?=$advert['id'] ?>" method="post"> <!-- form--invalid -->
+        <h2>Ваша ставка</h2>
+        <?php $classname = isset($errorBid) ? "form__item--invalid" : ""; ?>
+        <div class="form__item <?=$classname ?>"> <!-- form__item--invalid -->
+          <label for="bid">Сумма ставки*</label>
+          <input id="bid" type="text" name="bid" placeholder="Введите вашу ставку" required>
+          <span class="form__error"><?=$errorBid ?></span>
+        </div>
+        <button type="submit" class="button">Сделать ставку</button>
+      </form>
       <?php 
       } ?>
+      <table class="history-bids">
+        <caption>История ставок</caption>
+        <?php if (!empty($historyBid)) { 
+          for ($i = 0; $i <= count($historyBid) - 1; $i++) { ?>
+            <tr>
+            <td><?=$historyBid[$i]['name'] ?></td>
+            <td><?=$historyBid[$i]['sum'] ?></td>
+            <td><?=printTimeBid($historyBid[$i]['date_of']) ?></td>
+            </tr>
+          <?php 
+          } ?>
+        <?php 
+          } ?>
+      </table>
     </div>
   </div>
 </section>

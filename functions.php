@@ -30,8 +30,28 @@ function lifetimeLot($end_date) {
     if ($days > 0) {
         return $days . 'д ' . $hours . 'ч ' . $minutes . 'м';
     }
+    elseif ($diff_sec <= 0) {
+        return 'срок истек';
+    }
     else {
-        return $hours . 'ч ' . $minutes . 'м';   
+        return $hours . 'ч ' . $minutes . 'м';
+    }
+}
+
+function printTimeBid($time) {
+    $diff_sec = time() - strtotime($time);
+    $days = floor($diff_sec / 86400);
+    $hours = floor(($diff_sec % 86400) / 3600);
+    $minutes = floor(($diff_sec % 3600) / 60);
+
+    if ($days > 0) {
+        return $days . ' д. назад';
+    }
+    elseif ($hours > 0) {
+        return $hours . ' ч. назад';   
+    }
+    else {
+        return $minutes . ' м. назад';   
     }
 }
 
@@ -98,7 +118,7 @@ function dbGetCategories() {
     $result_get_categories = mysqli_query($link, $query_get_categories);
 
     if (!$result_get_categories) {
-        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
         die();
     }
 
@@ -109,7 +129,8 @@ function dbGetCategories() {
 function dbGetAdverts($limit) {
     $link = dbConnect();
 
-    $query_get_lots = "SELECT `lot`.`id`, `lot`.`name` as 'item', `category`.`name` as 'category', `starting_price`, `image_url`, `closing_date` 
+    $query_get_lots = "SELECT `lot`.`id`, `lot`.`name` as 'item', `category`.`name` as 'category', `starting_price`, `image_url`, 
+                                `closing_date` 
                         FROM `lot` 
                         JOIN `category` ON `category`.`id` = `lot`.`category_id`
                         WHERE `lot`.`closing_date` >= CURDATE()
@@ -118,7 +139,7 @@ function dbGetAdverts($limit) {
     $result_get_lots = mysqli_query($link, $query_get_lots);
 
     if (!$result_get_lots) {
-        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
         die();
     }
 
@@ -129,8 +150,8 @@ function dbGetAdverts($limit) {
 function dbGetLot($lotId) {
     $link = dbConnect();
 
-    $query_get_lot = "SELECT `lot`.`id`, `lot`.`name` as 'item', `category`.`name` as 'category', `starting_price`, `image_url`, `description`, 
-                                MAX(`bid`.`sum`) as 'max_bid', `bid_step`, `closing_date`
+    $query_get_lot = "SELECT `lot`.`id`, `lot`.`name` as 'item', `category`.`name` as 'category', `starting_price`, `image_url`, 
+                                `description`, MAX(`bid`.`sum`) as 'max_bid', `bid_step`, `closing_date`, `author_id`
                         FROM `lot` 
                         LEFT JOIN `bid` ON `lot`.`id` = `bid`.`lot_id`
                         JOIN `category` ON `category`.`id` = `lot`.`category_id`
@@ -140,7 +161,7 @@ function dbGetLot($lotId) {
     $result_get_lot = mysqli_query($link, $query_get_lot);
 
     if (!$result_get_lot) {
-        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
         die();
     }
 
@@ -157,15 +178,15 @@ function dbAddLot($adv) {
     $link = dbConnect();
 
     $sql = 'INSERT INTO `lot` (`creation_date`, `name`, `description`, `image_url`, `starting_price`, `closing_date`, `bid_step`, 
-                `author_id`, `winner_id`, `category_id`) VALUES (NOW(), ?, ?, ?, ?, ?, ?, 1, NULL, ?)';
+                `author_id`, `winner_id`, `category_id`) VALUES (NOW(), ?, ?, ?, ?, ?, ?, ?, NULL, ?)';
 
     $stmt = db_get_prepare_stmt($link, $sql, [$adv['lot-name'], $adv['message'], $adv['path'], $adv['lot-rate'], $adv['lot-date'], 
-                    $adv['lot-step'], $adv['category']]);
+                    $adv['lot-step'], $_SESSION['user']['id'], $adv['category']]);
 
     $res = mysqli_stmt_execute($stmt);
 
     if (!$res) {
-        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
         http_response_code(404);
         die();
     }
@@ -183,7 +204,7 @@ function dbCheckEmail($email) {
     $result_check_email = mysqli_query($link, $query_check_email);
 
     if (!$result_check_email) {
-        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
         http_response_code(404);
         die();
 }
@@ -201,7 +222,7 @@ function dbGetUserData($email) {
     $result_check_email = mysqli_query($link, $query_check_email);
 
     if (!$result_check_email) {
-        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
         http_response_code(404);
         die();
 }
@@ -247,7 +268,7 @@ function dbAddUser($data) {
     $res = mysqli_stmt_execute($stmt);
 
     if (!$res) {
-        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
         http_response_code(404);
         die();
     }
@@ -270,5 +291,69 @@ function startSession() {
     return $userSes;
 
 }
+
+function dbAddBid($bid, $lot_id, $user_id) {
+    $link = dbConnect();
+
+    $sql = 'INSERT INTO `bid` (`date_of`, `sum`, `user_id`, `lot_id`)
+                VALUES  (NOW(), ?, ?, ?)';
+
+    $stmt = db_get_prepare_stmt($link, $sql, [$bid, $user_id, $lot_id]);
+
+    $res = mysqli_stmt_execute($stmt);
+
+    if (!$res) {
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
+        http_response_code(404);
+        die();
+    }
+}
+
+function dbCheckUserBids($lot_id, $user_id) {
+    $link = dbConnect();
+
+    $sql = 'SELECT `id` 
+            FROM `bid`
+            WHERE `lot_id` = ?
+                AND `user_id` = ?';
+
+    $stmt = db_get_prepare_stmt($link, $sql, [$lot_id, $user_id]);
+
+    $res = mysqli_stmt_execute($stmt);    
+
+    mysqli_stmt_store_result($stmt);
+
+    if (!$res) {
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
+        http_response_code(404);
+        die();
+    }
+
+    return mysqli_stmt_num_rows($stmt);
+}
+
+function dbGetHistoryBids($lot_id, $limitRows) {
+    $link = dbConnect();
+
+    $lotClear = mysqli_real_escape_string($link, $lot_id);
+
+    $query_get_history_bids = "SELECT `date_of`, `sum`, `user`.`name` as 'name' 
+                                FROM `bid` 
+                                JOIN `user` ON `bid`.`user_id` = `user`.`id`            
+                                WHERE `lot_id` = $lotClear
+                                GROUP BY `bid`.`id`
+                                ORDER BY `bid`.`date_of` DESC LIMIT $limitRows ";
+
+    $result_get_history_bids = mysqli_query($link, $query_get_history_bids);
+
+    if (!$result_get_history_bids) {
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
+        http_response_code(404);
+        die();
+    }
+
+    return mysqli_fetch_all($result_get_history_bids, MYSQLI_ASSOC);
+}
+
 
 ?>
