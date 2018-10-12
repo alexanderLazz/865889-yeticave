@@ -30,8 +30,11 @@ function lifetimeLot($end_date) {
     if ($days > 0) {
         return $days . 'д ' . $hours . 'ч ' . $minutes . 'м';
     }
+    elseif ($diff_sec <= 0) {
+        return 'срок истек';
+    }
     else {
-        return $hours . 'ч ' . $minutes . 'м';   
+        return $hours . 'ч ' . $minutes . 'м';
     }
 }
 
@@ -115,7 +118,7 @@ function dbGetCategories() {
     $result_get_categories = mysqli_query($link, $query_get_categories);
 
     if (!$result_get_categories) {
-        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
         die();
     }
 
@@ -136,7 +139,7 @@ function dbGetAdverts($limit) {
     $result_get_lots = mysqli_query($link, $query_get_lots);
 
     if (!$result_get_lots) {
-        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
         die();
     }
 
@@ -158,7 +161,7 @@ function dbGetLot($lotId) {
     $result_get_lot = mysqli_query($link, $query_get_lot);
 
     if (!$result_get_lot) {
-        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
         die();
     }
 
@@ -183,7 +186,7 @@ function dbAddLot($adv) {
     $res = mysqli_stmt_execute($stmt);
 
     if (!$res) {
-        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
         http_response_code(404);
         die();
     }
@@ -201,7 +204,7 @@ function dbCheckEmail($email) {
     $result_check_email = mysqli_query($link, $query_check_email);
 
     if (!$result_check_email) {
-        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
         http_response_code(404);
         die();
 }
@@ -219,7 +222,7 @@ function dbGetUserData($email) {
     $result_check_email = mysqli_query($link, $query_check_email);
 
     if (!$result_check_email) {
-        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
         http_response_code(404);
         die();
 }
@@ -265,7 +268,7 @@ function dbAddUser($data) {
     $res = mysqli_stmt_execute($stmt);
 
     if (!$res) {
-        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
         http_response_code(404);
         die();
     }
@@ -300,7 +303,7 @@ function dbAddBid($bid, $lot_id, $user_id) {
     $res = mysqli_stmt_execute($stmt);
 
     if (!$res) {
-        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
         http_response_code(404);
         die();
     }
@@ -321,7 +324,7 @@ function dbCheckUserBids($lot_id, $user_id) {
     mysqli_stmt_store_result($stmt);
 
     if (!$res) {
-        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
         http_response_code(404);
         die();
     }
@@ -330,21 +333,21 @@ function dbCheckUserBids($lot_id, $user_id) {
 }
 
 function dbGetHistoryBids($lot_id, $limitRows) {
-    $link = dbConnect();    
+    $link = dbConnect();
 
     $lotClear = mysqli_real_escape_string($link, $lot_id);
 
     $query_get_history_bids = "SELECT `date_of`, `sum`, `user`.`name` as 'name' 
                                 FROM `bid` 
                                 JOIN `user` ON `bid`.`user_id` = `user`.`id`            
-                                WHERE `lot_id` = $lot_id
+                                WHERE `lot_id` = $lotClear
                                 GROUP BY `bid`.`id`
                                 ORDER BY `bid`.`date_of` DESC LIMIT $limitRows ";
 
     $result_get_history_bids = mysqli_query($link, $query_get_history_bids);
 
     if (!$result_get_history_bids) {
-        printf("Не удалось выполнить запрос: %s\n", mysqli_error());
+        printf("Не удалось выполнить запрос: %s\n", mysqli_error($link));
         http_response_code(404);
         die();
     }

@@ -52,13 +52,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	/* иначе выполнить запрос на добавление ставки */
 	else {
 		dbAddBid($bid, $lotId, $_SESSION['user']['id']);
+		$page_content = include_template('lot.php', ['advert' => $advert, 'categories' => $categories, 'cur_price' => $cur_price, 
+		'next_avail_bid' => $next_avail_bid, 'historyBid' => $historyBid, 'bidAlreadyDone' => $bidAlreadyDone]);
 		echo "<meta http-equiv='refresh' content='0'>";
 	}
 }
-
-$page_content = include_template('lot.php', ['advert' => $advert, 'categories' => $categories, 'cur_price' => $cur_price, 
+else {
+	$page_content = include_template('lot.php', ['advert' => $advert, 'categories' => $categories, 'cur_price' => $cur_price, 
 		'next_avail_bid' => $next_avail_bid, 'historyBid' => $historyBid, 'bidAlreadyDone' => $bidAlreadyDone]);
-
+}
 
 $layout_content = include_template('layout.php', ['content' => $page_content, 'title' => $advert['item'], 
 		'user_name' => $userSes['user_name'], 'user_avatar' => $userSes['user_avatar'], 'categories' => $categories]);
