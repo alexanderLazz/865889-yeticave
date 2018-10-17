@@ -2,7 +2,7 @@
   <ul class="nav__list container">
     <?php foreach ($categories as $key => $value) { ?>
     <li class="nav__item">
-      <a href="all-lots.html"><?=$value['name'] ?></a>
+      <a class="promo__link" href="category.php?id=<?=$value['id'] ?>"><?=$value['name'] ?></a>
     <?php 
     } ?>
   </ul>
@@ -33,7 +33,7 @@
         </div>
       </div>
       <?php if (isset($_SESSION['user']) and strtotime($advert['closing_date']) >= time() 
-                  and $advert['author_id'] != $_SESSION['user']['id'] and !$bidAlreadyDone) { 
+                  and $advert['author_id'] !== $_SESSION['user']['id'] and !$bidAlreadyDone) { 
           $classname = isset($errorBid) ? "form--invalid" : ""; ?>
       <form class="form container <?=$classname ?>" action="../lot.php?id=<?=$advert['id'] ?>" method="post"> <!-- form--invalid -->
         <h2>Ваша ставка</h2>

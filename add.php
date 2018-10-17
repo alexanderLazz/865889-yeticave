@@ -6,7 +6,7 @@ $userSes = startSession();
 
 $categories = dbGetCategories();
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$adv = array_map('htmlspecialchars', $_POST); 
 	$required = ['lot-name', 'message', 'lot-rate', 'lot-step'];
 	$required_num = ['lot-rate', 'lot-step'];
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	/* проверка - была ли выбрана категория */
 	$flag_ch_category = 0;
 	foreach ($categories as $key => $value) {
-		if ($value['id'] == $adv['category']) {
+		if ($value['id'] === $adv['category']) {
 			$flag_ch_category = 1;
 		}
 	}
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$tmp_name = $_FILES['lot-img']['tmp_name'];
 		$u_name_file = $_FILES['lot-img']['name'];
 		$resLoadImage = loadImg($tmp_name, $u_name_file);
-		if ($resLoadImage != -1) {
+		if ($resLoadImage !== -1) {
 			$adv['path'] = $resLoadImage;
 		}
 		else {

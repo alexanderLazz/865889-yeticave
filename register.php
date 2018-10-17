@@ -6,7 +6,7 @@ $userSes = startSession();
 
 $categories = dbGetCategories();
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$userData = array_map('htmlspecialchars', $_POST); 
 	$required = ['email', 'password', 'name', 'message'];
 	$errors = [];
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$tmp_name = $_FILES['avatar']['tmp_name'];
 		$u_name_file = $_FILES['avatar']['name'];
 		$resLoadImage = loadImg($tmp_name, $u_name_file);
-		if ($resLoadImage != -1) {
+		if ($resLoadImage !== -1) {
 			$userData['path'] = $resLoadImage;
 		}
 		else {
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$userData['password'] = password_hash($userData['password'], PASSWORD_DEFAULT);
 
 		/* если пользователь был добавлен */
-		if (dbAddUser($userData) == 1) {
+		if (dbAddUser($userData) === 1) {
 			header("Location: enter.php");
 			die();
 		}

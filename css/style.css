@@ -1288,10 +1288,10 @@ table.history-bids td {
   padding: 5px;
 }
 
-table.history-bids tr:nth-child(even) {
-  background-color:  #45abde;
+table.history-bids tr.markable {
+  background-color:  #99cfc4;
 }
 
-table.history-bids tr:nth-child(odd) {
+table.history-bids tr {
   background-color:  #ffffff;
 }

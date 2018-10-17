@@ -15,7 +15,7 @@
         <a class="main-header__logo" href="index.php">
             <img src="img/logo.svg" width="160" height="39" alt="Логотип компании YetiCave">
         </a>
-        <form class="main-header__search" method="get" action="https://echo.htmlacademy.ru">
+        <form class="main-header__search" method="get" action="../search.php">
             <input type="search" name="search" placeholder="Поиск лота">
             <input class="main-header__search-btn" type="submit" name="find" value="Найти">
         </form>
@@ -30,7 +30,8 @@
           </div>
           <div class="user-menu__logged">
             <p><?=$user_name ?></p>
-            <a href="logout.php">Выход</a>
+            <p><a href="mybids.php">Мои ставки</a></p>
+            <p><a href="logout.php">Выход</a></p>
           </div>
         <?php } else { ?>
           <ul class="user-menu__list">
@@ -56,7 +57,7 @@
         <ul class="nav__list container">
             <?php foreach ($categories as $key => $value) { ?>
             <li class="nav__item">
-                <a href="pages/all-lots.html"><?=$value['name'] ?></a>
+                <a class="promo__link" href="category.php?id=<?=$value['id'] ?>"><?=$value['name'] ?></a>
             </li>
             <?php
             } ?>

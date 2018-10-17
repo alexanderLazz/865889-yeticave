@@ -6,7 +6,7 @@ $userSes = startSession();
 
 $categories = dbGetCategories();
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$loginForm = array_map('htmlspecialchars', $_POST); 
 	$required = ['email', 'password'];
 	$errors = [];

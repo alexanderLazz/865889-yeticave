@@ -23,9 +23,9 @@ CREATE TABLE `lot` (
 	`name`				CHAR(130) NOT NULL,
 	`description`		VARCHAR(170) NOT NULL,
 	`image_url`			VARCHAR(120) NOT NULL,
-	`starting_price`	FLOAT NOT NULL,
+	`starting_price`	INT NOT NULL,
 	`closing_date`		DATETIME NOT NULL,
-	`bid_step`			FLOAT NOT NULL,
+	`bid_step`			INT NOT NULL,
 	`author_id`			INT NOT NULL,
 	`winner_id`			INT,
 	`category_id`		INT NOT NULL

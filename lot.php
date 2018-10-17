@@ -30,7 +30,7 @@ if (isset($_SESSION['user'])) {
 $limitRows = 10; // отображать кол-во ставок
 $historyBid = dbGetHistoryBids($lotId, $limitRows);
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$bid = (int) $_POST['bid'];
 	$errorBid = '';
 
